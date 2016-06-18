@@ -13,12 +13,13 @@ module Madness
     # The CommandLine class and the test suite should both call 
     # `Server.prepare` before calling Server.run!
     def self.prepare
-      # Sass::Plugin.options[:template_location] = styles_path
-      p styles_path
+      clear_css_folder
+
+      Sass::Plugin.options[:css_location] = css_path
       Sass::Plugin.add_template_location styles_path
-      Sass::Plugin.options[:css_location] = 'app/public/css'
       Slim::Engine.set_options pretty: true
 
+      set :root, File.expand_path('../../', __dir__)
       set :views, views_path
       set :bind, config.bind
       set :port, config.port      
@@ -42,10 +43,18 @@ module Madness
 
     def self.styles_path
       if config.styles.is_a? Symbol
-        "app/#{config.styles}/styles"
+        File.expand_path("../../app/#{config.styles}/styles", __dir__)
       else
         File.expand_path(config.styles, config.path)
       end
+    end
+
+    def self.css_path
+      File.expand_path('../../app/public/css', __dir__)
+    end
+
+    def self.clear_css_folder
+      File.delete "#{css_path}/main.css", "#{css_path}/main.css.map"
     end
   end
 
